@@ -24,34 +24,79 @@ int xprint_str(char *string)
     };
     return count;
 }
+// int xprint_digit(long digit, int base)
+// {
+//     int count = 0;
+//     char *symbols = "0123456789abcdef";
+//     if (digit < 0)
+//     {
+//         // only for decimal values, hex will be fetched as an unsigned int;
+//         xprint_char('-');
+//         //-digit flips its sign to a positive to go into the second case
+//         return xprint_digit(-digit, 10);
+//     }
+//     else if (digit < base)
+//     {
+//         // digit is positive & lower than the base;
+//         xprint_char(symbols[digit]);
+//     }
+//     else
+//     {
+//         // number bigger than the base & positive
+//         /*
+//             digit / base removes the right most digit
+//             423 => 42 => 4;
+//             digit % base gets the rightmost digit
+//             423 => 3 => 2 => 4
+//         */
+//         /*
+//         255 > 10 → call with 25
+
+//         25 > 10 → call with 2
+
+//         2 < 10 → print '2'
+
+//         Back to 25 → print '5'
+
+//         Back to 255 → print '5'
+
+//         Output: "255"
+//         */
+//         count = xprint_digit(digit / base, base);
+//         return count + xprint_digit(digit % base, base);
+//     }
+// }
+
 int xprint_digit(long digit, int base)
 {
     int count = 0;
+    int is_negative = 0;
+    int iterator = 0;
+    char buffer[65]; // Enough for 64-bit binary + null
     char *symbols = "0123456789abcdef";
     if (digit < 0)
     {
-        // only for decimal values, hex will be fetched as an unsigned int;
-        xprint_char('-');
-        //-digit flips its sign to a positive to go into the second case
-        return xprint_digit(-digit, 10);
-    }
-    else if (digit < base)
+        is_negative = 1;
+        digit = -digit;
+    };
+    if (digit == 0)
     {
-        // digit is positive & lower than the base;
-        xprint_char(symbols[digit]);
-    }
-    else
+        return xprint_char('0');
+    };
+    while (digit > 0)
     {
-        // number bigger than the base & positive
-        /*
-            digit / base removes the right most digit
-            423 => 42 => 4;
-            digit % base gets the rightmost digit
-            423 => 3 => 2 => 4
-        */
-        count = xprint_digit(digit / base, base);
-        return count + xprint_digit(digit % base, base);
-    }
+        // store in reverse order
+        buffer[iterator] = symbols[digit % base]; // rightmost digit
+        digit = digit / base;                     // remove last digit
+        iterator++;
+    };
+    while (iterator > 0)
+    {
+        // decrement the iterator to not get out of the buffer's boundaries
+        iterator--;
+        count += xprint_char(buffer[iterator]);
+    };
+    return count;
 }
 int xprint_format(char specifier, va_list ap)
 {
@@ -103,7 +148,6 @@ int xprintf(const char *format, ...)
 int main()
 {
     int count = 0;
-    // xprintf("Hello %c", 's');
     count = xprintf("%d\n", 423);
     xprintf("%d", count);
 }
